@@ -4,7 +4,7 @@ import streamlit as st
 st.set_page_config(page_title="RED-TIC Ecosistema", page_icon="🍃", layout="centered")
 
 # --- CSS AVANZADO (GLASSMORPHISM Y MINIMALISMO) ---
-st.markdown("""
+st.markdown('''
 <style>
     /* Ocultar elementos por defecto de Streamlit para look de App nativa */
     #MainMenu {visibility: hidden;}
@@ -13,35 +13,28 @@ st.markdown("""
 
     /* Fondo degradado moderno y limpio */
     .stApp {
-        background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+        background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%) !important;
     }
 
-    /* Tipografía elegante */
-    h1 {
-        font-family: 'Segoe UI', Roboto, sans-serif;
-        font-weight: 800;
-        color: #2D3748;
-        padding-top: 1rem;
-    }
-    
-    p {
-        color: #4A5568;
+    /* Tipografía elegante y forzar colores oscuros para evitar problemas con el Modo Oscuro */
+    h1, h2, h3, h4, h5, h6, p, span, div, label {
+        color: #2D3748 !important;
     }
 
     /* Diseño de tarjetas (Glassmorphism) para las preguntas */
     div[role="radiogroup"] {
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        padding: 25px;
-        border-radius: 16px;
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        box-shadow: 0 10px 30px 0 rgba(31, 38, 135, 0.05);
-        margin-bottom: 15px;
-        transition: transform 0.2s ease-in-out;
+        background: rgba(255, 255, 255, 0.7) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        padding: 25px !important;
+        border-radius: 16px !important;
+        border: 1px solid rgba(255, 255, 255, 0.5) !important;
+        box-shadow: 0 10px 30px 0 rgba(31, 38, 135, 0.05) !important;
+        margin-bottom: 15px !important;
+        transition: transform 0.2s ease-in-out !important;
     }
     div[role="radiogroup"]:hover {
-        transform: translateY(-2px);
+        transform: translateY(-2px) !important;
     }
 
     /* Tabs modernos e integrados */
@@ -51,32 +44,38 @@ st.markdown("""
         justify-content: center;
     }
     .stTabs [data-baseweb="tab"] {
-        background-color: #ffffff;
-        border-radius: 30px;
-        padding: 10px 20px;
-        border: 1px solid #E2E8F0;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-        transition: all 0.3s ease;
+        background-color: #ffffff !important;
+        border-radius: 30px !important;
+        padding: 10px 20px !important;
+        border: 1px solid #E2E8F0 !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02) !important;
+        transition: all 0.3s ease !important;
+        color: #2D3748 !important;
     }
     .stTabs [aria-selected="true"] {
         background-color: #38B2AC !important;
         color: white !important;
-        border: none;
-        box-shadow: 0 4px 12px rgba(56, 178, 172, 0.3);
+        border: none !important;
+        box-shadow: 0 4px 12px rgba(56, 178, 172, 0.3) !important;
     }
     
     /* Alertas y resultados */
     .stAlert {
-        border-radius: 16px;
-        border: none;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+        border-radius: 16px !important;
+        border: none !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.04) !important;
+    }
+    
+    /* Forzar color oscuro en elementos de Streamlit */
+    .stMarkdown p {
+        color: #4A5568 !important;
     }
 </style>
-""", unsafe_allow_html=True)
+''', unsafe_allow_html=True)
 
 # --- ENCABEZADO MINIMALISTA ---
-st.markdown("<h1 style='text-align: center;'>🍃 Ecosistema RED-TIC</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; font-size: 1.1rem; margin-bottom: 2rem;'>Navega directamente por tus sensaciones y encuentra soluciones al instante.</p>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #2D3748 !important;'>🍃 Ecosistema RED-TIC</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; font-size: 1.1rem; margin-bottom: 2rem; color: #4A5568 !important;'>Navega directamente por tus sensaciones y encuentra soluciones al instante.</p>", unsafe_allow_html=True)
 
 # --- TABS (ACCESO INMEDIATO, SIN PASOS EXTRA) ---
 t_escep, t_fatiga, t_ans, t_inef = st.tabs(["🧩 Escepticismo", "🔋 Fatiga", "🌬️ Ansiedad", "🎯 Ineficacia"])
