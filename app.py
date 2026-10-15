@@ -1,7 +1,7 @@
 import streamlit as st
 
 # --- CONFIGURACIÓN DE LA PÁGINA ---
-st.set_page_config(page_title="RED-TIC Ecosistema", page_icon="🍃", layout="centered")
+st.set_page_config(page_title="RED-TIC Ecosistema", layout="centered")
 
 # --- CSS AVANZADO (GLASSMORPHISM Y MINIMALISMO) ---
 st.markdown('''
