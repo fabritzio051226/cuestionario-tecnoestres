@@ -4,10 +4,10 @@ import pandas as pd
 import streamlit as st
 
 st.set_page_config(
-    page_title="Evaluación RED-TIC - Tecnoestrés", page_icon="💻", layout="wide"
+    page_title="Evaluación RED-TIC - Tecnoestrés", layout="wide"
 )
 
-st.title("💻 Cuestionario de Tecnoestrés (Modelo RED-TIC)")
+st.title(" Cuestionario de Tecnoestrés (Modelo RED-TIC)")
 st.markdown(
     """
 Este cuestionario evalúa la presencia de **tecnoestrés** en tus actividades diarias. 
@@ -52,7 +52,7 @@ PREGUNTAS = {
 
 # --- FORMULARIO DE CAPTURA ---
 with st.form("red_tic_form"):
-    st.subheader("📋 Registro de Evaluación")
+    st.subheader(" Registro de Evaluación")
 
     col_user, col_dept = st.columns(2)
     with col_user:
@@ -82,13 +82,13 @@ with st.form("red_tic_form"):
         st.write("")
 
     submitted = st.form_submit_button(
-        "📊 Procesar y Obtener Resultados", type="primary"
+        " Procesar y Obtener Resultados", type="primary"
     )
 
 # --- PROCESAMIENTO Y RESULTADOS ---
 if submitted:
     st.divider()
-    st.header("📈 Reporte de Resultados RED-TIC")
+    st.header(" Reporte de Resultados RED-TIC")
 
     # Cálculo de promedios
     promedios = {dim: np.mean(vals) for dim, vals in respuestas.items()}
@@ -136,7 +136,7 @@ if submitted:
         st.pyplot(fig)
 
     # --- RECOMENDACIONES ---
-    st.subheader("💡 Recomendaciones y Plan de Acción")
+    st.subheader(" Recomendaciones y Plan de Acción")
     for dim, score in promedios.items():
         if score >= 4.0:
             if dim == "Tecnoansiedad":
