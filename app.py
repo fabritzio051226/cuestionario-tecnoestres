@@ -1,3 +1,24 @@
+import streamlit as st
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# --- 1. CONFIGURACIÓN E INTRODUCCIÓN ---
+st.set_page_config(page_title="Cuestionario RED-TIC", page_icon="💻", layout="centered")
+
+st.title("💻 Evaluación de Tecnoestrés (RED-TIC)")
+
+# NUEVO: Información fija (ya no es desplegable)
+st.markdown("### 📚 ¿Qué es el Tecnoestrés y cuáles son sus tipos?")
+st.markdown('''
+El **Tecnoestrés** es un estado psicológico negativo relacionado con el uso de las Tecnologías de la Información y la Comunicación (TIC). Ocurre cuando sentimos que las demandas tecnológicas superan nuestra capacidad para manejarlas.
+
+**Se divide en 4 tipos principales:**
+* 🧩 **Escepticismo:** Sentir rechazo o desconfianza hacia la tecnología, a menudo por experiencias negativas previas.
+* 🔋 **Fatiga:** Cansancio físico y mental extremo, derivado de largas jornadas frente a pantallas o multitarea.
+* 🌬️ **Ansiedad:** Sentir tensión, miedo a cometer errores o nerviosismo al enfrentarse a herramientas digitales.
+* 🎯 **Ineficacia:** Sentir que los conocimientos actuales son insuficientes o dudar de la capacidad para aprender nuevos programas.
+''')
 
 st.divider()
 
