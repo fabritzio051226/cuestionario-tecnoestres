@@ -6,6 +6,27 @@ st.set_page_config(page_title="RED-TIC Ecosistema", page_icon="🍃", layout="ce
 # --- CSS AVANZADO (GLASSMORPHISM Y MINIMALISMO) ---
 st.markdown('''
 <style>
+
+ /* Hacer mas grande el si y el no */
+div[role="radiogroup"] label {
+        font-size: 1.2rem !important;
+    }
+ /* centrar opciones multiples  */
+    div[role="radiogroup"] {
+        /* ... (otras reglas de fondo y cristal que ya teníamos) ... */
+        
+        display: flex !important;
+        justify-content: center !important;
+        gap: 30px !important; 
+    }
+    /* centrar y hacer más grande el título de la pregunta */
+    .stMarkdown strong {
+        display: block !important;
+        text-align: center !important;
+        font-size: 1.4rem !important;
+        margin-top: 15px !important;
+        margin-bottom: 20px !important;
+    }
     /* Ocultar elementos por defecto de Streamlit para look de App nativa */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
