@@ -1,157 +1,150 @@
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
 import streamlit as st
 
-st.set_page_config(
-    page_title="Evaluación RED-TIC - Tecnoestrés", layout="wide"
+# --- CONFIGURACIÓN DE LA PÁGINA ---
+st.set_page_config(page_title="Ecosistema de Bienestar RED-TIC", page_icon="🌿", layout="centered")
+
+# --- CSS PERSONALIZADO (ECOSISTEMA AGRADABLE Y PSICOLÓGICO) ---
+st.markdown("""
+<style>
+    /* Fondo principal suave y relajante (tonos menta/crema) */
+    .stApp {
+        background-color: #F4F8F6;
+    }
+    
+    /* Tipografía y colores de encabezados */
+    h1, h2, h3 {
+        color: #3C5A53 !important;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+    
+    /* Estilo de los textos normales */
+    p {
+        color: #4A4A4A;
+        font-size: 1.1rem;
+    }
+
+    /* Contenedores para las preguntas simulando tarjetas limpias */
+    div[role="radiogroup"] {
+        background-color: #FFFFFF;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        margin-bottom: 15px;
+    }
+
+    /* Separador suave */
+    hr {
+        border-top: 1px solid #D5E2DC;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# --- ENCABEZADO ---
+st.title("🌿 Bienestar Digital: Ecosistema RED-TIC")
+st.markdown("### *Un espacio seguro para entender y mejorar tu relación con la tecnología.*")
+st.markdown("Este sistema te guiará paso a paso para encontrar la mejor solución a lo que estás experimentando, priorizando tu salud mental y eficiencia.")
+st.divider()
+
+# --- SELECTOR PRINCIPAL ---
+st.markdown("#### ¿Qué sensación describe mejor tu experiencia actual con la tecnología?")
+dimension = st.selectbox(
+    "Selecciona una dimensión para comenzar:",
+    [
+        "Elige una opción...", 
+        "A) Escepticismo (Siento rechazo o desconfianza)", 
+        "B) Fatiga (Siento cansancio extremo o agotamiento)", 
+        "C) Ansiedad (Siento tensión, miedo o nerviosismo)", 
+        "D) Ineficacia (Siento que me faltan conocimientos)"
+    ]
 )
 
-st.title(" Cuestionario de Tecnoestrés (Modelo RED-TIC)")
-st.markdown(
-    """
-Este cuestionario evalúa la presencia de **tecnoestrés** en tus actividades diarias. 
-Responde a cada afirmación seleccionando la frecuencia con la que experimentas cada situación.
-"""
-)
+st.write("") # Espaciador
 
-# --- ESCALA LIKERT ---
-ESCALA = {
-    0: "0 = Nunca / Casi nunca",
-    1: "1 = Algunas veces al año",
-    2: "2 = Una vez al mes",
-    3: "3 = Algunas veces al mes",
-    4: "4 = Una vez a la semana",
-    5: "5 = Algunas veces a la semana",
-    6: "6 = Siempre / Todos los días",
-}
+# --- LÓGICA DEL DIAGRAMA RED-TIC ---
 
-# --- PREGUNTAS POR DIMENSIÓN ---
-PREGUNTAS = {
-    "Tecnoansiedad": [
-        "Siento tensión y ansiedad al trabajar con tecnologías de la información.",
-        "Me asusta la idea de cometer errores o perder información al usar sistemas informáticos.",
-        "Me siento intimidado/a ante los cambios en el software o herramientas digitales.",
-    ],
-    "Tecnofatiga": [
-        "Al finalizar la jornada me siento agotado/a mentalmente por haber usado tecnologías.",
-        "Siento cansancio visual, dolores de cabeza o malestar físico por el uso de pantallas.",
-        "Me resulta difícil concentrarme después de horas trabajando con dispositivos electrónicos.",
-    ],
-    "Tecnoineficacia": [
-        "Siento que otros compañeros son mucho más eficientes que yo utilizando las TIC.",
-        "Dudo de mis capacidades para adaptarme a los nuevos programas informáticos.",
-        "Me cuesta resolver problemas técnicos básicos cuando ocurren en mi equipo.",
-    ],
-    "Tecnoadicción": [
-        "Tengo dificultades para desconectarme de la tecnología fuera del horario laboral/académico.",
-        "Siento la necesidad imperiosa de revisar mis notificaciones o correos constantemente.",
-        "Me cuesta enfocarme en una tarea sin revisar el teléfono o pestañas secundarias.",
-    ],
-}
+# A) ESCEPTICISMO
+if dimension.startswith("A)"):
+    st.markdown("### 🧩 Analizando tu Escepticismo")
+    q1 = st.radio("**¿Una experiencia negativa provocó este rechazo?**", ["Seleccionar", "No", "Sí"], horizontal=True)
+    
+    if q1 == "No":
+        st.success("✨ **Acción Recomendada:** Usar una alternativa tecnológica con la que te sientas más cómodo/a.")
+    
+    elif q1 == "Sí":
+        q2 = st.radio("**¿La causa fue una falla del sistema?**", ["Seleccionar", "No", "Sí"], horizontal=True)
+        
+        if q2 == "No":
+            st.info("💡 **Primer paso:** Es recomendable recibir soporte técnico general.")
+            q3 = st.radio("**¿Recibes apoyo para resolver este problema?**", ["Seleccionar", "No", "Sí"], horizontal=True, key="apoyo_no")
+            if q3 == "No":
+                st.success("✨ **Acción Recomendada:** Reducir el uso innecesario de esa tecnología para evitar frustración.")
+            elif q3 == "Sí":
+                st.success("✨ **Acción Recomendada:** Cambiar tu rutina de uso e integrar la tecnología poco a poco.")
+                
+        elif q2 == "Sí":
+            st.info("💡 **Primer paso:** Es importante buscar orientación específica sobre esa falla.")
+            q3 = st.radio("**¿Recibes apoyo para resolver este problema?**", ["Seleccionar", "No", "Sí"], horizontal=True, key="apoyo_si")
+            if q3 == "No":
+                st.success("✨ **Acción Recomendada:** Reducir el uso innecesario de esa tecnología.")
+            elif q3 == "Sí":
+                st.success("✨ **Acción Recomendada:** Cambiar tu rutina de uso apoyándote en la orientación recibida.")
 
-# --- FORMULARIO DE CAPTURA ---
-with st.form("red_tic_form"):
-    st.subheader(" Registro de Evaluación")
+# B) FATIGA
+elif dimension.startswith("B)"):
+    st.markdown("### 🔋 Analizando tu Fatiga Digital")
+    q1 = st.radio("**¿Usas las TIC (tecnologías) durante muchas horas?**", ["Seleccionar", "No", "Sí"], horizontal=True)
+    
+    if q1 == "No":
+        st.info("💡 **Primer paso:** Intenta reducir el tiempo continuo frente a la pantalla.")
+        q2 = st.radio("**¿Trabajas con muchas tareas a la vez (Multitasking)?**", ["Seleccionar", "No", "Sí"], horizontal=True)
+        if q2 == "No":
+            st.success("✨ **Acción Recomendada:** Alternar la actividad (cambiar entre tareas digitales y físicas).")
+        elif q2 == "Sí":
+            st.success("✨ **Acción Recomendada:** Cambiar tu rutina de uso para enfocarte en una cosa a la vez.")
+            
+    elif q1 == "Sí":
+        q2 = st.radio("**¿Realizas pausas durante tu jornada?**", ["Seleccionar", "No", "Sí"], horizontal=True)
+        if q2 == "No":
+            st.success("✨ **Acción Recomendada:** Establecer pausas activas obligatorias (ej. regla 20-20-20).")
+        elif q2 == "Sí":
+            st.success("✨ **Acción Recomendada:** Organizar mejor tus tareas para que las pausas sean más efectivas.")
 
-    col_user, col_dept = st.columns(2)
-    with col_user:
-        nombre = st.text_input("Nombre / ID de Usuario", value="Usuario 01")
-    with col_dept:
-        departamento = st.text_input(
-            "Área / Departamento / Escuela", value="General"
-        )
+# C) ANSIEDAD
+elif dimension.startswith("C)"):
+    st.markdown("### 🌬️ Analizando tu Ansiedad")
+    q1 = st.radio("**¿Has tenido errores al usar la tecnología recientemente?**", ["Seleccionar", "No", "Sí"], horizontal=True)
+    
+    if q1 == "No":
+        st.info("💡 **Sugerencia:** Intenta practicar en un entorno seguro antes de usarla para tareas importantes.")
+        q2 = st.radio("**¿Existe otra causa personal o externa de rechazo?**", ["Seleccionar", "No", "Sí"], horizontal=True)
+        if q2 == "No":
+            st.success("✨ **Acción Recomendada:** Usar instrucciones detalladas paso a paso para ganar confianza.")
+        elif q2 == "Sí":
+            st.success("✨ **Acción Recomendada:** Cambiar la rutina de uso y adaptar la herramienta a tus necesidades.")
+            
+    elif q1 == "Sí":
+        q2 = st.radio("**¿Estos errores te generan tensión o miedo?**", ["Seleccionar", "No", "Sí"], horizontal=True)
+        if q2 == "No":
+            st.success("✨ **Acción Recomendada:** Recibir capacitación para no volver a cometer esos errores.")
+        elif q2 == "Sí":
+            st.success("✨ **Acción Recomendada:** Solicitar apoyo directo. No enfrentes el problema solo/a.")
 
-    st.divider()
-
-    respuestas = {}
-    for dimension, lista_preguntas in PREGUNTAS.items():
-        st.markdown(f"### 🔹 Dimension: **{dimension}**")
-        respuestas[dimension] = []
-
-        for i, pregunta in enumerate(lista_preguntas):
-            val = st.select_slider(
-                label=f"**{i+1}.** {pregunta}",
-                options=list(ESCALA.keys()),
-                format_func=lambda x: ESCALA[x],
-                value=0,
-                key=f"{dimension}_{i}",
-            )
-            respuestas[dimension].append(val)
-
-        st.write("")
-
-    submitted = st.form_submit_button(
-        " Procesar y Obtener Resultados", type="primary"
-    )
-
-# --- PROCESAMIENTO Y RESULTADOS ---
-if submitted:
-    st.divider()
-    st.header(" Reporte de Resultados RED-TIC")
-
-    # Cálculo de promedios
-    promedios = {dim: np.mean(vals) for dim, vals in respuestas.items()}
-
-    col_res1, col_res2 = st.columns([1, 1])
-
-    with col_res1:
-        st.subheader("Niveles por Dimensión (Escala 0 - 6)")
-        df_promedios = pd.DataFrame(
-            list(promedios.items()), columns=["Dimensión", "Puntaje Promedio"]
-        )
-
-        def diagnosticar(score):
-            if score < 2.0:
-                return "🟢 Bajo / Saludable"
-            elif score < 4.0:
-                return "🟡 Moderado / Alerta"
-            else:
-                return "🔴 Alto / Riesgo de Tecnoestrés"
-
-        df_promedios["Nivel de Riesgo"] = df_promedios["Puntaje Promedio"].apply(
-            diagnosticar
-        )
-        st.dataframe(df_promedios.style.format({"Puntaje Promedio": "{:.2f}"}))
-
-    # --- GRÁFICO DE RADAR ---
-    with col_res2:
-        st.subheader("Perfil de Tecnoestrés")
-
-        categorias = list(promedios.keys())
-        valores = list(promedios.values())
-        valores += valores[:1]  # Cerrar el polígono
-
-        angulos = [n / float(len(categorias)) * 2 * np.pi for n in range(len(categorias))]
-        angulos += angulos[:1]
-
-        fig, ax = plt.subplots(figsize=(5, 5), subplot_kw=dict(polar=True))
-        ax.plot(angulos, valores, linewidth=2, linestyle="solid", color="#d9534f")
-        ax.fill(angulos, valores, color="#d9534f", alpha=0.25)
-
-        ax.set_xticks(angulos[:-1])
-        ax.set_xticklabels(categorias, fontsize=10)
-        ax.set_ylim(0, 6)
-
-        st.pyplot(fig)
-
-    # --- RECOMENDACIONES ---
-    st.subheader(" Recomendaciones y Plan de Acción")
-    for dim, score in promedios.items():
-        if score >= 4.0:
-            if dim == "Tecnoansiedad":
-                st.error(
-                    "**Alta Tecnoansiedad:** Se recomienda capacitación técnica progresiva y ambientes de prueba seguros sin temor al error."
-                )
-            elif dim == "Tecnofatiga":
-                st.error(
-                    "**Alta Tecnofatiga:** Implementa la regla 20-20-20 (descansar la vista cada 20 minutos) y pausas activas durante la jornada."
-                )
-            elif dim == "Tecnoineficacia":
-                st.error(
-                    "**Alta Tecnoineficacia:** Refuerza las competencias digitales básicas con tutorías personalizadas."
-                )
-            elif dim == "Tecnoadicción":
-                st.error(
-                    "**Alta Tecnoadicción:** Establece protocolos claros de desconexión digital al finalizar el horario lectivo/laboral."
-                )
+# D) INEFICACIA
+elif dimension.startswith("D)"):
+    st.markdown("### 🎯 Analizando tu Ineficacia Percibida")
+    q1 = st.radio("**¿Consideras insuficientes tus conocimientos actuales?**", ["Seleccionar", "No", "Sí"], horizontal=True)
+    
+    if q1 == "No":
+        st.info("💡 **Sugerencia:** Tal vez solo sea falta de costumbre. Puedes consultar el manual.")
+        q2 = st.radio("**¿Sueles usar tutoriales o guías de ayuda?**", ["Seleccionar", "No", "Sí"], horizontal=True)
+        if q2 == "No":
+            st.success("✨ **Acción Recomendada:** Practicar con el sistema de forma libre y sin presión.")
+        elif q2 == "Sí":
+            st.success("✨ **Acción Recomendada:** Cambiar tu rutina de uso y aplicar lo aprendido en los tutoriales.")
+            
+    elif q1 == "Sí":
+        q2 = st.radio("**¿Has recibido una capacitación adecuada para tu puesto/tarea?**", ["Seleccionar", "No", "Sí"], horizontal=True)
+        if q2 == "No":
+            st.success("✨ **Acción Recomendada:** Recibir capacitación formal y estructurada.")
+        elif q2 == "Sí":
+            st.success("✨ **Acción Recomendada:** Solicitar asistencia técnica o mentoría para resolver dudas específicas.")
