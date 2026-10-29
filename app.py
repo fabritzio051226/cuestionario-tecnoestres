@@ -10,6 +10,15 @@ st.set_page_config(
     layout="centered"
 )
 
+# --- RECURSOS GENERALES DE APOYO ---
+# Son enlaces públicos; verifica que sigan disponibles antes de publicar la aplicación.
+RECURSOS_AYUDA_TECNOLOGICA = [
+    ("Centro de ayuda de Microsoft", "https://support.microsoft.com/es-es"),
+    ("Centro de ayuda de Google", "https://support.google.com/?hl=es"),
+]
+RECURSO_PSICOLOGIA = ("Directorio de psicólogos en línea de Doctoralia",
+                      "https://www.doctoralia.com.mx/psicologo/online")
+
 st.title("💻 Evaluación de Tecnoestrés (RED-TIC)")
 
 st.markdown("### 📚 ¿Qué es el Tecnoestrés y cuáles son sus tipos?")
@@ -294,32 +303,50 @@ if submitted:
 
     st.divider()
     st.subheader("💡 Plan de acción personalizado")
-    st.write("Las recomendaciones siguen las rutas del árbol de decisiones de la imagen.")
-
     recomendaciones = obtener_recomendaciones(respuestas_binarias)
     for dimension, recomendacion in recomendaciones.items():
         st.info(f"**{dimension}:** {recomendacion}")
 
-    # --- 5. CONTACTO DE APOYO CUANDO HAY RESULTADOS ALTOS ---
+    # --- 5. OPCIONES DE APOYO CUANDO HAY RESULTADOS ALTOS ---
     dimensiones_altas = [dim for dim, score in promedios.items() if score >= 4.0]
 
     if dimensiones_altas:
         st.divider()
-        st.subheader("📞 Contacto de apoyo")
+        st.subheader("🤝 ¿Necesitas ayuda? Encuentra apoyo")
         st.warning(
             "Una o más dimensiones obtuvieron un promedio de 4.0 o superior. "
-            "Este aviso es orientativo, no es un diagnóstico. Si necesitas ayuda, "
-            "puedes contactar a las áreas de apoyo de tu institución."
+            "Este aviso es orientativo y no es un diagnóstico. Puedes consultar "
+            "las opciones de apoyo según la dificultad que estés experimentando."
         )
         st.markdown("**Dimensiones que conviene revisar:** " + ", ".join(dimensiones_altas))
-        st.markdown("""
-        - **Soporte técnico:** agrega aquí el correo o teléfono real del área de soporte.
-        - **Orientación académica:** agrega aquí el contacto real de tu institución.
-        - **Atención psicológica:** agrega aquí el contacto oficial, si tu institución lo ofrece.
-        """)
+
+        st.markdown("### 💻 1. Ayuda tecnológica")
+        st.write(
+            "Si tienes problemas con una aplicación, un programa o una herramienta digital, "
+            "puedes consultar los centros de ayuda oficiales para buscar instrucciones y soluciones."
+        )
+        for nombre, url in RECURSOS_AYUDA_TECNOLOGICA:
+            st.markdown(f"- [{nombre}]({url})")
+
+        st.markdown("### ⏱️ 2. Bienestar y organización del uso digital")
+        st.write(
+            "Si sientes cansancio o sobrecarga, intenta distribuir las tareas, hacer pausas "
+            "breves y evitar realizar muchas actividades al mismo tiempo. Si el problema se "
+            "relaciona con una herramienta específica, busca también orientación o capacitación."
+        )
+
+        st.markdown("### 🧠 3. Apoyo psicológico profesional")
+        st.write(
+            "Si la ansiedad o el malestar persisten, te afectan en tus actividades diarias o "
+            "sientes que necesitas hablar con alguien, puedes buscar un profesional de psicología. "
+            "No es obligatorio acudir a uno por obtener una puntuación alta; es una opción de apoyo."
+        )
+        nombre_psicologia, url_psicologia = RECURSO_PSICOLOGIA
+        st.markdown(f"- [Buscar profesionales: {nombre_psicologia}]({url_psicologia})")
         st.caption(
-            "Antes de entregar o publicar la aplicación, reemplaza estos textos por los "
-            "datos reales de contacto. No se han inventado correos ni teléfonos."
+            "Los enlaces dirigen a sitios externos. Revisa la formación, las credenciales, "
+            "la modalidad y el costo antes de elegir un servicio. El cuestionario no determina "
+            "por sí solo si una persona necesita tratamiento psicológico."
         )
 
     st.success("La evaluación terminó. Puedes revisar tus puntajes y las recomendaciones anteriores.")
@@ -330,3 +357,4 @@ st.caption(
     "son elementos distintos: el primero recoge respuestas de frecuencia y el segundo orienta "
     "recomendaciones según respuestas Sí/No."
 )
+
