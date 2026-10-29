@@ -103,8 +103,9 @@ PREGUNTAS_ARBOL = {
 
 st.markdown("### 📝 1. Cuestionario RED-TIC")
 st.write(
-    "Responde los 16 enunciados según tu experiencia. Después contesta las preguntas "
-    "Sí/No del árbol de decisiones que aparece más abajo."
+    "Primero, indica con qué frecuencia has experimentado cada situación relacionada con "
+    "el uso de la tecnología. Después, responde unas preguntas breves sobre tu experiencia "
+    "para recibir recomendaciones que se ajusten mejor a tus respuestas."
 )
 
 with st.form("formulario_cuestionario"):
@@ -126,10 +127,11 @@ with st.form("formulario_cuestionario"):
             numero_item += 1
         st.divider()
 
-    st.markdown("### 🌳 2. Preguntas del árbol de decisiones")
+    st.markdown("### 🧭 2. Preguntas sobre tu experiencia con la tecnología")
     st.write(
-        "Contesta todas las preguntas de cada dimensión. Algunas solo se utilizan "
-        "si la respuesta anterior activa esa parte del árbol."
+        "Responde Sí o No a las preguntas de cada dimensión. Estas respuestas permiten "
+        "identificar situaciones concretas y ofrecer sugerencias prácticas relacionadas "
+        "con tus necesidades."
     )
 
     respuestas_binarias = {}
@@ -357,21 +359,23 @@ st.divider()
 st.subheader("ℹ️ Acerca de esta evaluación")
 
 st.markdown("""
-**Evaluación de tecnoestrés**
+**¿Por qué hay dos grupos de preguntas?**
 
-Esta parte recoge tus respuestas sobre las experiencias que tienes al utilizar tecnologías.
-Los resultados se organizan en cuatro dimensiones: escepticismo, fatiga, ansiedad e ineficacia.
-Su finalidad es ayudarte a identificar cuáles de estas experiencias podrían requerir atención.
+**1. Conocer tus experiencias con la tecnología**
 
-**Orientación y recomendaciones**
+Primero respondes 16 enunciados sobre la frecuencia con la que experimentas distintas
+situaciones al utilizar tecnologías. Tus respuestas permiten calcular resultados en cuatro
+dimensiones: escepticismo, fatiga, ansiedad e ineficacia.
 
-Las preguntas sobre situaciones concretas permiten ofrecer sugerencias prácticas según tus
-respuestas, como buscar soporte técnico, recibir capacitación, consultar instrucciones,
-organizar tareas o establecer pausas durante el uso de la tecnología.
+**2. Comprender mejor tu situación y ofrecer recomendaciones**
+
+Después respondes preguntas breves sobre situaciones concretas, como dificultades técnicas,
+pausas durante el uso de la tecnología, errores o necesidades de capacitación. Estas respuestas
+se utilizan para ofrecer recomendaciones prácticas relacionadas con cada dimensión.
 
 **Finalidad de la herramienta**
 
-Esta aplicación ofrece información y orientación inicial sobre dificultades relacionadas con
-el uso de las tecnologías. Los resultados no constituyen un diagnóstico psicológico y, por sí
-solos, no determinan si una persona necesita tratamiento profesional.
+La evaluación ofrece información y orientación inicial sobre experiencias relacionadas con el
+uso de la tecnología. Los resultados no constituyen un diagnóstico psicológico ni determinan,
+por sí solos, si una persona necesita tratamiento profesional.
 """)
