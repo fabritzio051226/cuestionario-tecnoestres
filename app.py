@@ -1,268 +1,332 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 
-st.set_page_config(page_title="Evaluación de Tecnoestrés", page_icon="🧠", layout="wide")
-st.title("🧠 Evaluación de Tecnoestrés")
-st.write("Aplicación con el cuestionario RED-TIC y el árbol de decisiones de las dimensiones Escepticismo, Fatiga, Ansiedad e Ineficacia.")
-st.info("Esta herramienta es educativa y orientativa; no sustituye una evaluación psicológica profesional.")
+# --- 1. CONFIGURACIÓN E INTRODUCCIÓN ---
+st.set_page_config(
+    page_title="Cuestionario RED-TIC",
+    page_icon="💻",
+    layout="centered"
+)
 
-# Cambia estos marcadores por datos oficiales de tu institución antes de publicar la aplicación.
-CONTACTOS_APOYO = {
-    "Soporte técnico": "Agregar correo o teléfono institucional",
-    "Orientación académica": "Agregar correo o teléfono institucional",
-    "Atención psicológica": "Agregar correo o teléfono institucional",
+st.title("💻 Evaluación de Tecnoestrés (RED-TIC)")
+
+st.markdown("### 📚 ¿Qué es el Tecnoestrés y cuáles son sus tipos?")
+st.markdown("""
+El **Tecnoestrés** es un estado psicológico negativo relacionado con el uso de las
+Tecnologías de la Información y la Comunicación (TIC). Puede aparecer cuando sentimos
+que las demandas tecnológicas superan nuestra capacidad para manejarlas.
+
+**Se divide en 4 dimensiones principales:**
+* 🧩 **Escepticismo:** sentir rechazo o desconfianza hacia la tecnología.
+* 🔋 **Fatiga:** sentir cansancio después de utilizar tecnologías.
+* 🌬️ **Ansiedad:** sentir tensión o miedo al utilizar tecnologías.
+* 🎯 **Ineficacia:** dudar de la propia capacidad para utilizar tecnologías.
+""")
+
+st.divider()
+
+# --- 2. ESCALAS Y PREGUNTAS ---
+ESCALA_LIKERT = {
+    0: "0 = Nada / Nunca",
+    1: "1 = Casi nada",
+    2: "2 = Raramente",
+    3: "3 = Algunas veces",
+    4: "4 = Bastante",
+    5: "5 = Con frecuencia",
+    6: "6 = Siempre"
 }
+ESCALA_BINARIA = ["Seleccionar...", "No", "Sí"]
 
-ESCALA = {
-    0: "0 — Nada / Nunca",
-    1: "1 — Casi nada / Un par de veces al año",
-    2: "2 — Raramente / Una vez al mes",
-    3: "3 — Algunas veces / Un par de veces al mes",
-    4: "4 — Bastante / Una vez a la semana",
-    5: "5 — Con frecuencia / Un par de veces a la semana",
-    6: "6 — Siempre / Todos los días",
-}
-
-# Los 16 ítems RED-TIC, organizados en cuatro dimensiones.
-DIMENSIONES = {
+# Los 16 ítems RED-TIC, agrupados en las cuatro dimensiones.
+PREGUNTAS_REDTIC = {
     "Escepticismo": [
         "Con el paso del tiempo, las tecnologías me interesan cada vez menos.",
         "Cada vez me siento menos implicado en el uso de las TIC.",
         "Soy más cínico respecto de la contribución de las tecnologías en mi trabajo.",
-        "Dudo del significado del trabajo con estas tecnologías.",
+        "Dudo del significado del trabajo con estas tecnologías."
     ],
     "Fatiga": [
         "Me resulta difícil relajarme después de un día de trabajo utilizándolas.",
         "Cuando termino de trabajar con TIC, me siento agotado/a.",
         "Estoy tan cansado/a cuando acabo trabajar con ellas que no puedo hacer nada más.",
-        "Es difícil concentrarme después de trabajar con tecnologías.",
+        "Es difícil concentrarme después de trabajar con tecnologías."
     ],
     "Ansiedad": [
         "Me siento tenso y ansioso al trabajar con tecnologías.",
         "Me asusta pensar que puedo destruir una gran cantidad de información por el uso inadecuado de las mismas.",
         "Dudo a la hora de utilizar TIC por miedo a cometer errores.",
-        "El trabajar con ellas me hace sentir incómodo, irritable e impaciente.",
+        "El trabajar con ellas me hace sentir incómodo, irritable e impaciente."
     ],
     "Ineficacia": [
         "En mi opinión, soy ineficaz utilizando tecnologías.",
         "Es difícil trabajar con tecnologías de la información y de la comunicación.",
         "La gente dice que soy ineficaz utilizando tecnologías.",
-        "Estoy inseguro de acabar bien mis tareas cuando utilizo las TIC.",
-    ],
+        "Estoy inseguro de acabar bien mis tareas cuando utilizo las TIC."
+    ]
 }
 
+# Todas las preguntas Sí/No del árbol de la imagen están en esta página.
+# Se muestran juntas para que la persona no tenga que navegar entre pestañas.
+PREGUNTAS_ARBOL = {
+    "Escepticismo": [
+        "¿Una experiencia negativa provocó rechazo a la tecnología?",
+        "¿La causa fue una falla del sistema?",
+        "¿Recibe apoyo para resolverlo?"
+    ],
+    "Fatiga": [
+        "¿Usas las TIC durante muchas horas?",
+        "¿Realiza pausas durante la jornada?",
+        "¿Trabaja con muchas tareas a la vez?"
+    ],
+    "Ansiedad": [
+        "¿Ha tenido errores al usar la tecnología?",
+        "¿Los errores generan tensión o miedo?",
+        "¿Existe otra causa de rechazo?"
+    ],
+    "Ineficacia": [
+        "¿Considera insuficientes sus conocimientos?",
+        "¿Ha recibido capacitación adecuada?",
+        "¿Usa tutoriales o guías?"
+    ]
+}
 
-def si_no(pregunta, key):
-    """Pregunta binaria sin respuesta preseleccionada para evitar respuestas accidentales."""
-    return st.radio(pregunta, ["Sí", "No"], index=None, horizontal=True, key=key)
+st.markdown("### 📝 1. Cuestionario RED-TIC")
+st.write(
+    "Responde los 16 enunciados según tu experiencia. Después contesta las preguntas "
+    "Sí/No del árbol de decisiones que aparece más abajo."
+)
 
+with st.form("formulario_cuestionario"):
+    respuestas_likert = {}
+    numero_item = 1
 
-def arbol_escepticismo():
-    st.markdown("#### A. Escepticismo")
-    rechazo = si_no("¿Una experiencia negativa provocó rechazo a la tecnología?", "a_rechazo")
-    if rechazo is None:
-        return None
+    for dimension, lista_preguntas in PREGUNTAS_REDTIC.items():
+        st.markdown(f"#### {dimension}")
+        respuestas_likert[dimension] = []
+        for pregunta in lista_preguntas:
+            val = st.select_slider(
+                f"{numero_item}. {pregunta}",
+                options=list(ESCALA_LIKERT.keys()),
+                value=0,
+                format_func=lambda x: ESCALA_LIKERT[x],
+                key=f"redtic_{numero_item}"
+            )
+            respuestas_likert[dimension].append(val)
+            numero_item += 1
+        st.divider()
+
+    st.markdown("### 🌳 2. Preguntas del árbol de decisiones")
+    st.write(
+        "Contesta todas las preguntas de cada dimensión. Algunas solo se utilizan "
+        "si la respuesta anterior activa esa parte del árbol."
+    )
+
+    respuestas_binarias = {}
+    for dimension, lista_preguntas in PREGUNTAS_ARBOL.items():
+        st.markdown(f"#### {dimension}")
+        respuestas_binarias[dimension] = []
+        for i, pregunta in enumerate(lista_preguntas):
+            val = st.radio(
+                pregunta,
+                options=ESCALA_BINARIA,
+                horizontal=True,
+                index=0,
+                key=f"arbol_{dimension}_{i}"
+            )
+            respuestas_binarias[dimension].append(val)
+        st.divider()
+
+    submitted = st.form_submit_button(
+        "📊 Calcular resultados y recomendaciones",
+        type="primary"
+    )
+
+# --- 3. FUNCIONES PARA APLICAR EL ÁRBOL DE LA IMAGEN ---
+def obtener_recomendaciones(respuestas):
+    recomendaciones = {}
+
+    # A. Escepticismo
+    esc = respuestas["Escepticismo"]
+    rechazo, falla, apoyo = esc
     if rechazo == "No":
-        return ["Usar una alternativa."]
-
-    falla = si_no("¿La causa fue una falla del sistema?", "a_falla")
-    if falla is None:
-        return None
-    recomendacion_inicial = "Recibir soporte técnico." if falla == "No" else "Buscar orientación."
-
-    apoyo = si_no("¿Recibe apoyo para resolverlo?", "a_apoyo")
-    if apoyo is None:
-        return None
-    recomendacion_final = "Reducir uso innecesario." if apoyo == "No" else "Cambiar rutina de uso."
-    return [recomendacion_inicial, recomendacion_final]
-
-
-def arbol_fatiga():
-    st.markdown("#### B. Fatiga")
-    horas = si_no("¿Usas las TIC durante muchas horas?", "b_horas")
-    if horas is None:
-        return None
-    if horas == "Sí":
-        pausas = si_no("¿Realiza pausas durante la jornada?", "b_pausas")
-        if pausas is None:
-            return None
-        return ["Organizar tareas."] if pausas == "Sí" else ["Establecer pausas."]
-
-    multitarea = si_no("¿Trabaja con muchas tareas a la vez?", "b_multitarea")
-    if multitarea is None:
-        return None
-    if multitarea == "No":
-        return ["Reducir tiempo continuo.", "Alternar actividad."]
-    return ["Reducir tiempo continuo.", "Cambiar rutina de uso."]
-
-
-def arbol_ansiedad():
-    st.markdown("#### C. Ansiedad")
-    errores = si_no("¿Ha tenido errores al usar la tecnología?", "c_errores")
-    if errores is None:
-        return None
-    if errores == "Sí":
-        tension = si_no("¿Los errores generan tensión o miedo?", "c_tension")
-        if tension is None:
-            return None
-        return ["Solicitar apoyo."] if tension == "Sí" else ["Recibir capacitación."]
-
-    otra_causa = si_no("¿Existe otra causa de rechazo?", "c_otra_causa")
-    if otra_causa is None:
-        return None
-    if otra_causa == "No":
-        return ["Practicar antes de usar.", "Usar instrucciones."]
-    return ["Practicar antes de usar.", "Cambiar rutina de uso."]
-
-
-def arbol_ineficacia():
-    st.markdown("#### D. Ineficacia")
-    conocimientos = si_no("¿Considera insuficientes sus conocimientos?", "d_conocimientos")
-    if conocimientos is None:
-        return None
-    if conocimientos == "Sí":
-        capacitacion = si_no("¿Ha recibido capacitación adecuada?", "d_capacitacion")
-        if capacitacion is None:
-            return None
-        return ["Recibir capacitación."] if capacitacion == "No" else ["Solicitar asistencia."]
-
-    tutoriales = si_no("¿Usa tutoriales o guías?", "d_tutoriales")
-    if tutoriales is None:
-        return None
-    if tutoriales == "No":
-        return ["Consultar manual.", "Practicar con el sistema."]
-    return ["Consultar manual.", "Cambiar rutina de uso."]
-
-
-# Estado compartido entre pestañas de Streamlit.
-if "respuestas_redtic" not in st.session_state:
-    st.session_state.respuestas_redtic = None
-if "promedios_redtic" not in st.session_state:
-    st.session_state.promedios_redtic = None
-if "recomendaciones_arbol" not in st.session_state:
-    st.session_state.recomendaciones_arbol = {}
-if "total_pt" not in st.session_state:
-    st.session_state.total_pt = None
-
-p_tab, a_tab, r_tab, c_tab = st.tabs([
-    "1. Cuestionario RED-TIC", "2. Árbol de decisiones", "3. Resultados", "4. Apoyo y contacto"
-])
-
-with p_tab:
-    st.header("Cuestionario RED-TIC")
-    st.write("Contesta los 16 ítems. Selecciona la respuesta que mejor refleje tu experiencia con las tecnologías.")
-    with st.form("form_redtic"):
-        respuestas = {}
-        n = 1
-        for dimension, items in DIMENSIONES.items():
-            st.subheader(dimension)
-            for item in items:
-                respuestas[n] = st.select_slider(
-                    f"{n}. {item}", options=list(ESCALA.keys()), value=0,
-                    format_func=lambda valor: ESCALA[valor], key=f"redtic_{n}"
-                )
-                n += 1
-        enviar = st.form_submit_button("Calcular resultados del cuestionario", type="primary")
-
-    if enviar:
-        promedios = {}
-        inicio = 1
-        for dimension in DIMENSIONES:
-            promedios[dimension] = sum(respuestas[i] for i in range(inicio, inicio + 4)) / 4
-            inicio += 4
-        st.session_state.respuestas_redtic = respuestas
-        st.session_state.promedios_redtic = promedios
-        # Fórmula PT indicada en la copia de manual consultada: suma de los 16 ítems / 4.
-        st.session_state.total_pt = sum(respuestas.values()) / 4
-        st.success("Se calcularon los resultados.")
-        for dimension, promedio in promedios.items():
-            st.write(f"**{dimension}:** {promedio:.2f} de 6")
-        st.write(f"**Puntuación total PT (según la fórmula del manual consultado):** {st.session_state.total_pt:.2f}")
-        st.caption("Se muestran puntuaciones, no diagnósticos. Confirma la fórmula y los puntos de corte con la versión exacta del manual que utilizará tu proyecto.")
-
-with a_tab:
-    st.header("Árbol de decisiones")
-    st.write("Esta sección incluye las preguntas del diagrama. Las preguntas de seguimiento aparecen según las respuestas anteriores, para respetar las rutas del árbol.")
-    dimension = st.selectbox("Selecciona la rama que deseas recorrer:", ["A. Escepticismo", "B. Fatiga", "C. Ansiedad", "D. Ineficacia"], key="rama_seleccionada")
-    st.caption("Recorre una rama a la vez. Puedes regresar y elegir otra para guardar también su recomendación.")
-
-    if dimension == "A. Escepticismo":
-        recomendaciones = arbol_escepticismo()
-        nombre = "Escepticismo"
-    elif dimension == "B. Fatiga":
-        recomendaciones = arbol_fatiga()
-        nombre = "Fatiga"
-    elif dimension == "C. Ansiedad":
-        recomendaciones = arbol_ansiedad()
-        nombre = "Ansiedad"
-    else:
-        recomendaciones = arbol_ineficacia()
-        nombre = "Ineficacia"
-
-    if st.button("Guardar recomendación de esta rama", type="primary"):
-        if recomendaciones is None:
-            st.error("Contesta todas las preguntas que se muestran en esta ruta antes de guardar la recomendación.")
+        recomendaciones["Escepticismo"] = "Usar una alternativa."
+    elif rechazo == "Sí":
+        if falla == "No":
+            recomendacion_inicial = "Recibir soporte técnico."
+        elif falla == "Sí":
+            recomendacion_inicial = "Buscar orientación."
         else:
-            st.session_state.recomendaciones_arbol[nombre] = recomendaciones
-            st.success("Recomendación guardada.")
+            recomendacion_inicial = None
 
-    if st.session_state.recomendaciones_arbol:
-        st.subheader("Recomendaciones guardadas")
-        for dim, lista in st.session_state.recomendaciones_arbol.items():
-            st.markdown(f"**{dim}:**")
-            for recomendacion in lista:
-                st.write(f"- {recomendacion}")
+        if recomendacion_inicial is not None:
+            if apoyo == "No":
+                recomendaciones["Escepticismo"] = "Reducir uso innecesario."
+            elif apoyo == "Sí":
+                recomendaciones["Escepticismo"] = "Cambiar rutina de uso."
+            else:
+                recomendaciones["Escepticismo"] = recomendacion_inicial
+        else:
+            recomendaciones["Escepticismo"] = "Falta responder si la causa fue una falla del sistema."
 
-with r_tab:
-    st.header("Resultados del cuestionario")
-    if st.session_state.promedios_redtic is None:
-        st.info("Completa primero el cuestionario en la pestaña 1.")
+    # B. Fatiga
+    fat = respuestas["Fatiga"]
+    muchas_horas, pausas, multitarea = fat
+    if muchas_horas == "Sí":
+        if pausas == "No":
+            recomendaciones["Fatiga"] = "Establecer pausas."
+        elif pausas == "Sí":
+            recomendaciones["Fatiga"] = "Organizar tareas."
+        else:
+            recomendaciones["Fatiga"] = "Falta responder si realiza pausas durante la jornada."
+    elif muchas_horas == "No":
+        if multitarea == "No":
+            recomendaciones["Fatiga"] = "Alternar actividad."
+        elif multitarea == "Sí":
+            recomendaciones["Fatiga"] = "Cambiar rutina de uso."
+        else:
+            recomendaciones["Fatiga"] = "Reducir tiempo continuo. Falta responder si trabaja con muchas tareas a la vez."
     else:
-        promedios = st.session_state.promedios_redtic
-        cols = st.columns(4)
-        for col, (dim, valor) in zip(cols, promedios.items()):
-            col.metric(dim, f"{valor:.2f} / 6")
-        st.subheader("Gráfico de puntuaciones por dimensión")
-        fig, ax = plt.subplots(figsize=(8, 4.5))
-        etiquetas = list(promedios.keys())
+        recomendaciones["Fatiga"] = "Falta responder si usa las TIC durante muchas horas."
+
+    # C. Ansiedad
+    ans = respuestas["Ansiedad"]
+    errores, tension, otra_causa = ans
+    if errores == "Sí":
+        if tension == "No":
+            recomendaciones["Ansiedad"] = "Recibir capacitación."
+        elif tension == "Sí":
+            recomendaciones["Ansiedad"] = "Solicitar apoyo."
+        else:
+            recomendaciones["Ansiedad"] = "Falta responder si los errores generan tensión o miedo."
+    elif errores == "No":
+        if otra_causa == "No":
+            recomendaciones["Ansiedad"] = "Usar instrucciones."
+        elif otra_causa == "Sí":
+            recomendaciones["Ansiedad"] = "Cambiar rutina de uso."
+        else:
+            recomendaciones["Ansiedad"] = "Practicar antes de usar. Falta responder si existe otra causa de rechazo."
+    else:
+        recomendaciones["Ansiedad"] = "Falta responder si ha tenido errores al usar la tecnología."
+
+    # D. Ineficacia
+    inef = respuestas["Ineficacia"]
+    conocimientos, capacitacion, tutoriales = inef
+    if conocimientos == "Sí":
+        if capacitacion == "No":
+            recomendaciones["Ineficacia"] = "Recibir capacitación."
+        elif capacitacion == "Sí":
+            recomendaciones["Ineficacia"] = "Solicitar asistencia."
+        else:
+            recomendaciones["Ineficacia"] = "Falta responder si ha recibido capacitación adecuada."
+    elif conocimientos == "No":
+        if tutoriales == "No":
+            recomendaciones["Ineficacia"] = "Practicar con el sistema."
+        elif tutoriales == "Sí":
+            recomendaciones["Ineficacia"] = "Cambiar rutina de uso."
+        else:
+            recomendaciones["Ineficacia"] = "Consultar manual. Falta responder si usa tutoriales o guías."
+    else:
+        recomendaciones["Ineficacia"] = "Falta responder si considera insuficientes sus conocimientos."
+
+    return recomendaciones
+
+
+# --- 4. RESULTADOS ---
+if submitted:
+    st.header("📊 Resultados y plan de acción")
+
+    # Validación de las respuestas Sí/No necesarias para recorrer cada rama.
+    errores_formulario = []
+    for dimension, respuestas in respuestas_binarias.items():
+        for pregunta, respuesta in zip(PREGUNTAS_ARBOL[dimension], respuestas):
+            # Algunas preguntas de seguimiento pueden no aplicar a esa ruta.
+            # No bloqueamos todo el formulario: las recomendaciones indicarán si falta un dato.
+            pass
+
+    promedios = {
+        dim: float(np.mean(valores))
+        for dim, valores in respuestas_likert.items()
+    }
+
+    st.subheader("Tus puntajes por dimensión")
+    col1, col2 = st.columns([1, 1])
+
+    with col1:
+        for dim, score in promedios.items():
+            if score < 2.0:
+                estado = "🟢 Bajo"
+            elif score < 4.0:
+                estado = "🟡 Moderado"
+            else:
+                estado = "🔴 Alto"
+            st.markdown(f"**{dim}:** {score:.1f}/6.0 — {estado}")
+
+    with col2:
+        categorias = list(promedios.keys())
         valores = list(promedios.values())
-        barras = ax.bar(etiquetas, valores)
+        valores_cerrados = valores + valores[:1]
+        angulos = [n / float(len(categorias)) * 2 * np.pi for n in range(len(categorias))]
+        angulos_cerrados = angulos + angulos[:1]
+
+        fig, ax = plt.subplots(figsize=(4, 4), subplot_kw=dict(polar=True))
+        ax.plot(angulos_cerrados, valores_cerrados, linewidth=2)
+        ax.fill(angulos_cerrados, valores_cerrados, alpha=0.25)
+        ax.set_xticks(angulos)
+        ax.set_xticklabels(categorias, fontsize=8)
         ax.set_ylim(0, 6)
-        ax.set_ylabel("Promedio de respuestas (0–6)")
-        ax.set_title("Puntuación promedio por dimensión RED-TIC")
-        ax.grid(axis="y", linestyle="--", alpha=0.35)
-        ax.bar_label(barras, fmt="%.2f", padding=3)
-        plt.xticks(rotation=15, ha="right")
-        fig.tight_layout()
+        ax.set_title("Gráfico de perfil")
         st.pyplot(fig)
         plt.close(fig)
-        tabla = pd.DataFrame({"Dimensión": etiquetas, "Promedio (0–6)": [round(v, 2) for v in valores]})
-        st.dataframe(tabla, use_container_width=True, hide_index=True)
-        if st.session_state.recomendaciones_arbol:
-            st.subheader("Recomendaciones del árbol")
-            for dim, lista in st.session_state.recomendaciones_arbol.items():
-                st.markdown(f"**{dim}:**")
-                for recomendacion in lista:
-                    st.write(f"- {recomendacion}")
-        else:
-            st.info("Aún no has guardado recomendaciones del árbol de decisiones.")
-        st.caption("El gráfico resume las respuestas al cuestionario. No es un diagnóstico ni reemplaza el recorrido del árbol de decisiones.")
 
-with c_tab:
-    st.header("Apoyo y contacto")
-    st.write("Si necesitas ayuda con las herramientas tecnológicas o te preocupa tu resultado, puedes contactar al área correspondiente de tu institución.")
-    st.warning("Los siguientes contactos son marcadores de ejemplo. Sustitúyelos por contactos reales antes de entregar o publicar el proyecto.")
-    for area, contacto in CONTACTOS_APOYO.items():
-        st.markdown(f"**{area}:** {contacto}")
-    if st.session_state.promedios_redtic is not None:
-        elevadas = [dim for dim, valor in st.session_state.promedios_redtic.items() if valor >= 4]
-        if elevadas:
-            st.subheader("Orientación sugerida")
-            st.write("En esta aplicación, estas dimensiones tienen un promedio de 4 o más: " + ", ".join(elevadas) + ".")
-            st.write("Este umbral es provisional y orientativo, no un punto de corte clínico validado. Revisa también las recomendaciones del árbol.")
-        else:
-            st.write("Ninguna dimensión alcanza el umbral provisional de 4 en esta aplicación. Puedes solicitar apoyo si aun así lo necesitas.")
+    tabla = pd.DataFrame({
+        "Dimensión": list(promedios.keys()),
+        "Promedio (0–6)": [round(v, 2) for v in promedios.values()]
+    })
+    st.dataframe(tabla, use_container_width=True, hide_index=True)
+
+    st.caption(
+        "Los niveles bajo, moderado y alto son una clasificación orientativa usada en esta "
+        "interfaz; no deben presentarse como diagnóstico clínico ni como puntos de corte "
+        "oficiales sin verificar la versión del manual utilizada."
+    )
+
+    st.divider()
+    st.subheader("💡 Plan de acción personalizado")
+    st.write("Las recomendaciones siguen las rutas del árbol de decisiones de la imagen.")
+
+    recomendaciones = obtener_recomendaciones(respuestas_binarias)
+    for dimension, recomendacion in recomendaciones.items():
+        st.info(f"**{dimension}:** {recomendacion}")
+
+    # --- 5. CONTACTO DE APOYO CUANDO HAY RESULTADOS ALTOS ---
+    dimensiones_altas = [dim for dim, score in promedios.items() if score >= 4.0]
+
+    if dimensiones_altas:
+        st.divider()
+        st.subheader("📞 Contacto de apoyo")
+        st.warning(
+            "Una o más dimensiones obtuvieron un promedio de 4.0 o superior. "
+            "Este aviso es orientativo, no es un diagnóstico. Si necesitas ayuda, "
+            "puedes contactar a las áreas de apoyo de tu institución."
+        )
+        st.markdown("**Dimensiones que conviene revisar:** " + ", ".join(dimensiones_altas))
+        st.markdown("""
+        - **Soporte técnico:** agrega aquí el correo o teléfono real del área de soporte.
+        - **Orientación académica:** agrega aquí el contacto real de tu institución.
+        - **Atención psicológica:** agrega aquí el contacto oficial, si tu institución lo ofrece.
+        """)
+        st.caption(
+            "Antes de entregar o publicar la aplicación, reemplaza estos textos por los "
+            "datos reales de contacto. No se han inventado correos ni teléfonos."
+        )
+
+    st.success("La evaluación terminó. Puedes revisar tus puntajes y las recomendaciones anteriores.")
 
 st.divider()
-st.caption("Los ítems RED-TIC deben cotejarse con la versión exacta del manual utilizada en el proyecto. Las preguntas y rutas del árbol corresponden al diagrama proporcionado.")
+st.caption(
+    "La aplicación es informativa y educativa. El cuestionario RED-TIC y el árbol de decisiones "
+    "son elementos distintos: el primero recoge respuestas de frecuencia y el segundo orienta "
+    "recomendaciones según respuestas Sí/No."
+)
