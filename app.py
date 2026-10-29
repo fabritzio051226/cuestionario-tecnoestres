@@ -352,9 +352,26 @@ if submitted:
     st.success("La evaluación terminó. Puedes revisar tus puntajes y las recomendaciones anteriores.")
 
 st.divider()
-st.caption(
-    "La aplicación es informativa y educativa. El cuestionario RED-TIC y el árbol de decisiones "
-    "son elementos distintos: el primero recoge respuestas de frecuencia y el segundo orienta "
-    "recomendaciones según respuestas Sí/No."
-)
 
+# --- 6. ACERCA DE ESTA EVALUACIÓN ---
+st.subheader("ℹ️ Acerca de esta evaluación")
+
+st.markdown("""
+**Evaluación de tecnoestrés**
+
+Esta parte recoge tus respuestas sobre las experiencias que tienes al utilizar tecnologías.
+Los resultados se organizan en cuatro dimensiones: escepticismo, fatiga, ansiedad e ineficacia.
+Su finalidad es ayudarte a identificar cuáles de estas experiencias podrían requerir atención.
+
+**Orientación y recomendaciones**
+
+Las preguntas sobre situaciones concretas permiten ofrecer sugerencias prácticas según tus
+respuestas, como buscar soporte técnico, recibir capacitación, consultar instrucciones,
+organizar tareas o establecer pausas durante el uso de la tecnología.
+
+**Finalidad de la herramienta**
+
+Esta aplicación ofrece información y orientación inicial sobre dificultades relacionadas con
+el uso de las tecnologías. Los resultados no constituyen un diagnóstico psicológico y, por sí
+solos, no determinan si una persona necesita tratamiento profesional.
+""")
