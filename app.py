@@ -304,7 +304,108 @@ if submitted:
     )
 
     st.divider()
-    st.subheader("💡 Plan de acción personalizado")
+    st.subheader("🧭 ¿Qué significan tus puntuaciones?")
+    st.write(
+        "Esta sección interpreta los promedios del cuestionario y ofrece sugerencias "
+        "generales para las dimensiones con puntuaciones más elevadas. Después encontrarás "
+        "un plan de acción diferente, basado en tus respuestas a las preguntas sobre situaciones concretas."
+    )
+
+    # Estas interpretaciones usan los rangos provisionales de la interfaz:
+    # Bajo < 2; Moderado >= 2 y < 4; Alto >= 4.
+    # No son puntos de corte clínicos oficiales.
+    consejos_por_dimension = {
+        "Escepticismo": {
+            "Alto": (
+                "Tu puntuación indica que las respuestas relacionadas con el interés, la "
+                "confianza o el valor que atribuyes al uso de las tecnologías fueron relativamente "
+                "elevadas. Puede ayudarte identificar qué herramientas o experiencias generan "
+                "esa sensación, revisar si existe una dificultad concreta y buscar una alternativa, "
+                "instrucciones o soporte técnico cuando sea necesario."
+            ),
+            "Moderado": (
+                "Algunas respuestas sugieren cierta pérdida de interés o confianza en las tecnologías. "
+                "Puedes identificar qué situaciones te resultan frustrantes y buscar formas más sencillas "
+                "de realizar esas tareas."
+            ),
+            "Bajo": (
+                "Tus respuestas reflejan una menor presencia de experiencias relacionadas con esta dimensión. "
+                "Mantén las prácticas que te ayudan a utilizar las tecnologías de manera útil y cómoda."
+            ),
+        },
+        "Fatiga": {
+            "Alto": (
+                "Tus respuestas reflejan una presencia relativamente elevada de cansancio o dificultad "
+                "para recuperarte después de utilizar tecnologías. Intenta distribuir las tareas, hacer "
+                "pausas breves, alternar actividades y evitar mantener varias tareas digitales al mismo tiempo."
+            ),
+            "Moderado": (
+                "Tus respuestas sugieren que el cansancio relacionado con el uso de tecnologías puede aparecer "
+                "en algunas situaciones. Prueba a organizar las actividades por prioridad, hacer pausas y "
+                "observar qué tareas te resultan más agotadoras."
+            ),
+            "Bajo": (
+                "Tus respuestas reflejan una menor presencia de experiencias relacionadas con la fatiga. "
+                "Procura mantener un ritmo de trabajo equilibrado y descansar cuando lo necesites."
+            ),
+        },
+        "Ansiedad": {
+            "Alto": (
+                "Tus respuestas indican una presencia relativamente elevada de tensión, preocupación o miedo "
+                "al utilizar tecnologías. Puede ayudarte practicar con funciones poco a poco, consultar "
+                "instrucciones antes de realizar tareas difíciles y pedir capacitación o ayuda cuando la necesites."
+            ),
+            "Moderado": (
+                "Tus respuestas sugieren que algunas tareas tecnológicas pueden generarte preocupación o "
+                "inseguridad. Intenta practicar en un entorno seguro, utilizar guías y pedir ayuda si una tarea "
+                "no te queda clara."
+            ),
+            "Bajo": (
+                "Tus respuestas reflejan una menor presencia de experiencias relacionadas con la ansiedad "
+                "al utilizar tecnologías. Continúa usando instrucciones y medidas preventivas cuando sean útiles."
+            ),
+        },
+        "Ineficacia": {
+            "Alto": (
+                "Tus respuestas indican dudas relativamente elevadas sobre tu capacidad para utilizar tecnologías "
+                "o completar tareas con ellas. Puedes comenzar con funciones básicas, consultar tutoriales "
+                "confiables, practicar paso a paso y solicitar capacitación o asistencia cuando sea necesario."
+            ),
+            "Moderado": (
+                "Tus respuestas sugieren que podrías tener dudas en algunas tareas tecnológicas. Practicar con "
+                "una función a la vez, consultar manuales y dividir una tarea en pasos pequeños puede ayudarte "
+                "a ganar confianza."
+            ),
+            "Bajo": (
+                "Tus respuestas reflejan una menor presencia de dudas relacionadas con esta dimensión. "
+                "Continúa desarrollando tus habilidades y consulta guías cuando te encuentres con herramientas nuevas."
+            ),
+        },
+    }
+
+    for dimension, score in promedios.items():
+        if score < 2.0:
+            nivel = "Bajo"
+        elif score < 4.0:
+            nivel = "Moderado"
+        else:
+            nivel = "Alto"
+
+        with st.expander(f"{dimension}: {nivel} ({score:.1f}/6)", expanded=(nivel == "Alto")):
+            st.write(consejos_por_dimension[dimension][nivel])
+
+    st.caption(
+        "Los niveles y consejos se utilizan como orientación general en esta aplicación. "
+        "Los rangos bajo, moderado y alto son provisionales y no deben interpretarse como "
+        "puntos de corte oficiales ni como diagnóstico psicológico."
+    )
+
+    st.divider()
+    st.subheader("💡 Plan de acción según tus respuestas")
+    st.write(
+        "Estas recomendaciones se basan en las situaciones específicas que señalaste "
+        "en las preguntas de Sí/No y complementan la interpretación de tus puntuaciones."
+    )
     recomendaciones = obtener_recomendaciones(respuestas_binarias)
     for dimension, recomendacion in recomendaciones.items():
         st.info(f"**{dimension}:** {recomendacion}")
