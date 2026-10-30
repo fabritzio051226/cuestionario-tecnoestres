@@ -410,46 +410,102 @@ if submitted:
     for dimension, recomendacion in recomendaciones.items():
         st.info(f"**{dimension}:** {recomendacion}")
 
-    # --- 5. OPCIONES DE APOYO CUANDO HAY RESULTADOS ALTOS ---
+    # --- 5. RECOMENDACIONES Y FUENTES SEGÚN LAS DIMENSIONES ALTAS ---
     dimensiones_altas = [dim for dim, score in promedios.items() if score >= 4.0]
 
     if dimensiones_altas:
         st.divider()
-        st.subheader("🤝 ¿Necesitas ayuda? Encuentra apoyo")
-        st.warning(
-            "Una o más dimensiones obtuvieron un promedio de 4.0 o superior. "
-            "Este aviso es orientativo y no es un diagnóstico. Puedes consultar "
-            "las opciones de apoyo según la dificultad que estés experimentando."
-        )
-        st.markdown("**Dimensiones que conviene revisar:** " + ", ".join(dimensiones_altas))
+        st.subheader("🤝 Recomendaciones para tus resultados")
+        st.markdown("**Dimensiones con puntuación alta:** " + ", ".join(dimensiones_altas))
 
-        st.markdown("### 💻 1. Ayuda tecnológica")
-        st.write(
-            "Si tienes problemas con una aplicación, un programa o una herramienta digital, "
-            "puedes consultar los centros de ayuda oficiales para buscar instrucciones y soluciones."
-        )
-        for nombre, url in RECURSOS_AYUDA_TECNOLOGICA:
-            st.markdown(f"- [{nombre}]({url})")
+        recursos_por_dimension = {
+            "Escepticismo": [
+                (
+                    "Identifica qué herramienta o experiencia te genera rechazo. "
+                    "Si el problema se debe a errores o fallas, consulta primero la ayuda oficial "
+                    "del programa y prueba sus instrucciones básicas antes de descartarlo.",
+                    [
+                        ("Centro de ayuda de Microsoft", "https://support.microsoft.com/es-es"),
+                        ("Centro de ayuda de Google", "https://support.google.com/?hl=es"),
+                    ],
+                )
+            ],
+            "Fatiga": [
+                (
+                    "Prueba una rutina semanal de actividad física moderada, por ejemplo caminar "
+                    "30 minutos cinco días a la semana, ajustando el ritmo a tu condición física. "
+                    "También puedes incluir ejercicios sencillos de fortalecimiento dos días por semana. "
+                    "Durante el uso de tecnologías, intercala pausas breves y alterna actividades. "
+                    "La actividad física es una recomendación general de bienestar; no sustituye el descanso "
+                    "ni constituye un tratamiento específico para el tecnoestrés.",
+                    [
+                        ("OMS: recomendaciones de actividad física para adultos", "https://www.who.int/europe/news-room/fact-sheets/item/physical-activity"),
+                    ],
+                ),
+                (
+                    "Procura mantener una alimentación variada y equilibrada. Como guía general, "
+                    "incluye verduras y frutas, cereales y leguminosas o alimentos de origen animal "
+                    "en tus comidas principales, de acuerdo con tus necesidades. Esta sugerencia no "
+                    "es una dieta individual ni significa que la alimentación por sí sola resuelva la fatiga.",
+                    [
+                        ("IMSS: Plato del Bien Comer", "https://www.imss.gob.mx/salud-en-linea/platobiencomer"),
+                        ("IMSS: recomendaciones para una sana alimentación", "https://www.imss.gob.mx/sites/all/statics/salud/infografiasl/Recomendaciones-sana-alimentacion.pdf"),
+                    ],
+                ),
+            ],
+            "Ansiedad": [
+                (
+                    "Cuando notes tensión al utilizar una herramienta, detente un momento, revisa "
+                    "las instrucciones y vuelve a intentarlo paso a paso. También puedes practicar "
+                    "un ejercicio de respiración tranquila durante unos minutos. Si el malestar continúa "
+                    "o afecta tus actividades cotidianas, considera consultar a un profesional.",
+                    [
+                        ("NHS: ejercicio de respiración para el estrés", "https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/breathing-exercises-for-stress/"),
+                    ],
+                )
+            ],
+            "Ineficacia": [
+                (
+                    "Elige una herramienta que te resulte difícil y practica primero sus funciones "
+                    "básicas. Divide el aprendizaje en tareas pequeñas y consulta guías paso a paso "
+                    "antes de avanzar a funciones más complejas.",
+                    [
+                        ("Google Workspace: centro de aprendizaje y guías", "https://workspace.google.com/intl/es/training/?hl=es"),
+                        ("Microsoft: recursos de formación para Microsoft 365", "https://support.microsoft.com/es-es/office/o365-itpro/train-your-users-on-office-and-microsoft-365"),
+                    ],
+                )
+            ],
+        }
 
-        st.markdown("### ⏱️ 2. Bienestar y organización del uso digital")
-        st.write(
-            "Si sientes cansancio o sobrecarga, intenta distribuir las tareas, hacer pausas "
-            "breves y evitar realizar muchas actividades al mismo tiempo. Si el problema se "
-            "relaciona con una herramienta específica, busca también orientación o capacitación."
-        )
+        contenido_recomendaciones = [
+            "**Se identificaron puntuaciones elevadas en una o más dimensiones. "
+            "Estas sugerencias y fuentes son orientativas; no constituyen un diagnóstico "
+            "ni un tratamiento personalizado.**"
+        ]
+        for dimension in dimensiones_altas:
+            contenido_recomendaciones.append(f"### {dimension}")
+            for consejo, fuentes in recursos_por_dimension[dimension]:
+                contenido_recomendaciones.append(consejo)
+                contenido_recomendaciones.append("**Fuentes de consulta:**")
+                for nombre, url in fuentes:
+                    # El formato de código muestra la dirección como texto y evita convertirla en vínculo.
+                    contenido_recomendaciones.append(f"- {nombre}: `{url}`")
 
-        st.markdown("### 🧠 3. Apoyo psicológico profesional")
-        st.write(
-            "Si la ansiedad o el malestar persisten, te afectan en tus actividades diarias o "
-            "sientes que necesitas hablar con alguien, puedes buscar un profesional de psicología. "
-            "No es obligatorio acudir a uno por obtener una puntuación alta; es una opción de apoyo."
-        )
-        nombre_psicologia, url_psicologia = RECURSO_PSICOLOGIA
-        st.markdown(f"- [Buscar profesionales: {nombre_psicologia}]({url_psicologia})")
+        # Todo el contenido de orientación queda dentro del recuadro amarillo.
+        st.warning("\n\n".join(contenido_recomendaciones))
+
         st.caption(
-            "Los enlaces dirigen a sitios externos. Revisa la formación, las credenciales, "
-            "la modalidad y el costo antes de elegir un servicio. El cuestionario no determina "
-            "por sí solo si una persona necesita tratamiento psicológico."
+            "Las fuentes se muestran como texto para que puedas identificarlas y consultarlas "
+            "copiando la dirección. Las recomendaciones de ejercicio y alimentación son generales; "
+            "cada persona debe adaptarlas a su edad, condición física, salud y necesidades. "
+            "Si tiene una condición médica o restricciones, debe consultar a un profesional."
+        )
+
+    else:
+        st.info(
+            "Ninguna dimensión alcanzó el nivel alto establecido provisionalmente en esta página. "
+            "Puedes revisar las interpretaciones y recomendaciones generales de cada dimensión "
+            "que aparecen arriba."
         )
 
     st.success("La evaluación terminó. Puedes revisar tus puntajes y las recomendaciones anteriores.")
